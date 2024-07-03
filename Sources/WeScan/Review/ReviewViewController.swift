@@ -27,17 +27,17 @@ final class ReviewViewController: UIViewController {
         return imageView
     }()
 
-    private lazy var enhanceButton: UIBarButtonItem = {
-        let image = UIImage(
-            systemName: "wand.and.rays.inverse",
-            named: "enhance",
-            in: Bundle(for: ScannerViewController.self),
-            compatibleWith: nil
-        )
-        let button = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(toggleEnhancedImage))
-        button.tintColor = .white
-        return button
-    }()
+//    private lazy var enhanceButton: UIBarButtonItem = {
+//        let image = UIImage(
+//            systemName: "wand.and.rays.inverse",
+//            named: "enhance",
+//            in: Bundle(for: ScannerViewController.self),
+//            compatibleWith: nil
+//        )
+//        let button = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(toggleEnhancedImage))
+//        button.tintColor = .white
+//        return button
+//    }()
 
     private lazy var rotateButton: UIBarButtonItem = {
         let image = UIImage(systemName: "rotate.right", named: "rotate", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
@@ -110,7 +110,7 @@ final class ReviewViewController: UIViewController {
 
         let fixedSpace = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        toolbarItems = [fixedSpace, enhanceButton, flexibleSpace, rotateButton, fixedSpace]
+        toolbarItems = [flexibleSpace, rotateButton, fixedSpace]
     }
 
     private func setupConstraints() {
@@ -146,18 +146,18 @@ final class ReviewViewController: UIViewController {
         }
     }
 
-    @objc func toggleEnhancedImage() {
-        guard enhancedImageIsAvailable else { return }
+    // @objc func toggleEnhancedImage() {
+    //     guard enhancedImageIsAvailable else { return }
 
-        isCurrentlyDisplayingEnhancedImage.toggle()
-        reloadImage()
+    //     isCurrentlyDisplayingEnhancedImage.toggle()
+    //     reloadImage()
 
-        if isCurrentlyDisplayingEnhancedImage {
-            enhanceButton.tintColor = .yellow
-        } else {
-            enhanceButton.tintColor = .white
-        }
-    }
+    //     if isCurrentlyDisplayingEnhancedImage {
+    //         enhanceButton.tintColor = .yellow
+    //     } else {
+    //         enhanceButton.tintColor = .white
+    //     }
+    // }
 
     @objc func rotateImage() {
         rotationAngle.value += 90

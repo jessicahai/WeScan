@@ -51,10 +51,20 @@ public final class ScannerViewController: UIViewController {
         return button
     }()
 
-    private lazy var flashButton: UIBarButtonItem = {
+    private lazy var flashButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
         let image = UIImage(systemName: "bolt.fill", named: "flash", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
-        let button = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(toggleFlash))
-        button.tintColor = .white
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(toggleFlash), for: .touchUpInside)
+        button.tintColor = UIColor.white
+
+        if UIImagePickerController.isFlashAvailable(for: .rear) == false {
+            let flashOffImage = UIImage(systemName: "bolt.slash.fill", named: "flashUnavailable", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+            button.setImage(flashOffImage, for: .normal)
+            button.addTarget(self, action: #selector(toggleFlash), for: .touchUpInside)
+            button.tintColor = UIColor.white
+        }
 
         return button
     }()
@@ -75,7 +85,7 @@ public final class ScannerViewController: UIViewController {
         view.backgroundColor = UIColor.black
 
         setupViews()
-        setupNavigationBar()
+        // setupNavigationBar()
         setupConstraints()
 
         captureSessionManager = CaptureSessionManager(videoPreviewLayer: videoPreviewLayer, delegate: self)
@@ -94,7 +104,7 @@ public final class ScannerViewController: UIViewController {
         captureSessionManager?.start()
         UIApplication.shared.isIdleTimerDisabled = true
 
-        navigationController?.navigationBar.barStyle = .blackTranslucent
+        navigationController?.setNavigationBarHidden(true, animated: animated) // navigationController?.navigationBar.barStyle = .blackTranslucent
     }
 
     override public func viewDidLayoutSubviews() {
@@ -123,28 +133,37 @@ public final class ScannerViewController: UIViewController {
         view.layer.addSublayer(videoPreviewLayer)
         quadView.translatesAutoresizingMaskIntoConstraints = false
         quadView.editable = false
+        view.addSubview(flashButton) // added by emburse
         view.addSubview(quadView)
         // view.addSubview(cancelButton)
         view.addSubview(shutterButton)
         view.addSubview(activityIndicator)
     }
 
-    private func setupNavigationBar() {
-        navigationItem.setLeftBarButton(flashButton, animated: false)
-        // navigationItem.setRightBarButton(autoScanButton, animated: false)
+    // private func setupNavigationBar() {
+    //     navigationItem.setLeftBarButton(flashButton, animated: false)
+    //     navigationItem.setRightBarButton(autoScanButton, animated: false)
 
-        if UIImagePickerController.isFlashAvailable(for: .rear) == false {
-            let flashOffImage = UIImage(systemName: "bolt.slash.fill", named: "flashUnavailable", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
-            flashButton.image = flashOffImage
-            flashButton.tintColor = UIColor.lightGray
-        }
-    }
+    //     if UIImagePickerController.isFlashAvailable(for: .rear) == false {
+    //         let flashOffImage = UIImage(systemName: "bolt.slash.fill", named: "flashUnavailable", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+    //         flashButton.image = flashOffImage
+    //         flashButton.tintColor = UIColor.lightGray
+    //     }
+    // }
 
     private func setupConstraints() {
+        var flashButtonConstraints = [NSLayoutConstraint]()
         var quadViewConstraints = [NSLayoutConstraint]()
         // var cancelButtonConstraints = [NSLayoutConstraint]()
         var shutterButtonConstraints = [NSLayoutConstraint]()
         var activityIndicatorConstraints = [NSLayoutConstraint]()
+
+        flashButtonConstraints = [
+            flashButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            flashButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24),
+            flashButton.widthAnchor.constraint(equalToConstant: 44),
+            flashButton.heightAnchor.constraint(equalToConstant: 44)
+        ]
 
         quadViewConstraints = [
             quadView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -182,7 +201,7 @@ public final class ScannerViewController: UIViewController {
             shutterButtonConstraints.append(shutterButtonBottomConstraint)
         }
 
-        NSLayoutConstraint.activate(quadViewConstraints + shutterButtonConstraints + activityIndicatorConstraints)
+        NSLayoutConstraint.activate(flashButtonConstraints + quadViewConstraints + shutterButtonConstraints + activityIndicatorConstraints)
     }
 
     // MARK: - Tap to Focus
@@ -252,15 +271,15 @@ public final class ScannerViewController: UIViewController {
         switch state {
         case .on:
             flashEnabled = true
-            flashButton.image = flashImage
+            flashButton.setImage(flashImage, for: .normal)
             flashButton.tintColor = .yellow
         case .off:
             flashEnabled = false
-            flashButton.image = flashImage
+            flashButton.setImage(flashImage, for: .normal)
             flashButton.tintColor = .white
         case .unknown, .unavailable:
             flashEnabled = false
-            flashButton.image = flashOffImage
+            flashButton.setImage(flashOffImage, for: .normal)
             flashButton.tintColor = UIColor.lightGray
         }
     }

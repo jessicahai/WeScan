@@ -33,7 +33,7 @@ final class EditScanViewController: UIViewController {
     private lazy var nextButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        let image = UIImage(systemName: "rotate.right", named: "rotate", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        let image = UIImage(systemName: "wand.and.rays.inverse", named: "enhance", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(pushReviewController), for: .touchUpInside)
         button.tintColor = navigationController?.navigationBar.tintColor
@@ -43,7 +43,7 @@ final class EditScanViewController: UIViewController {
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        let image = UIImage(systemName: "rotate.right", named: "rotate", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        let image = UIImage(systemName: "wand.and.rays.inverse", named: "enhance", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         button.tintColor = .white

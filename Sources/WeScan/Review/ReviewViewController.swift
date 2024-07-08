@@ -52,7 +52,7 @@ final class ReviewViewController: UIViewController {
     private lazy var backButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        let image = UIImage(systemName: "rotate.right", named: "rotate", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        let image = UIImage(systemName: "wand.and.rays.inverse", named: "enhance", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         button.tintColor = .white
@@ -62,7 +62,7 @@ final class ReviewViewController: UIViewController {
     private lazy var doneButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        let image = UIImage(systemName: "rotate.right", named: "rotate", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        let image = UIImage(systemName: "wand.and.rays.inverse", named: "enhance", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(finishScan), for: .touchUpInside)
         button.tintColor = .white
@@ -122,7 +122,7 @@ final class ReviewViewController: UIViewController {
 
         let rotateButtonConstraints = [
             rotateButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            rotateButton.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
+            rotateButton.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30),
         ]
 
         let backButtonConstraints = [

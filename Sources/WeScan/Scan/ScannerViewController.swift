@@ -104,7 +104,6 @@ public final class ScannerViewController: UIViewController {
         UIApplication.shared.isIdleTimerDisabled = true
 
         navigationController?.setNavigationBarHidden(true, animated: animated) 
-        // navigationController?.navigationBar.barStyle = .blackTranslucent
     }
 
     override public func viewDidLayoutSubviews() {
@@ -117,7 +116,7 @@ public final class ScannerViewController: UIViewController {
         super.viewWillDisappear(animated)
         UIApplication.shared.isIdleTimerDisabled = false
 
-        navigationController?.setNavigationBarHidden(false, animated: animated)
+        // navigationController?.setNavigationBarHidden(false, animated: animated)
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.barStyle = originalBarStyle ?? .default
         captureSessionManager?.stop()
@@ -136,9 +135,9 @@ public final class ScannerViewController: UIViewController {
         quadView.editable = false
         view.addSubview(quadView)
         // view.addSubview(cancelButton)
-        view.addSubview(shutterButton)
-        view.addSubview(activityIndicator)
         view.addSubview(flashButton) // added by emburse
+        view.addSubview(activityIndicator)
+        view.addSubview(shutterButton)
     }
 
     // private func setupNavigationBar() {
@@ -155,9 +154,9 @@ public final class ScannerViewController: UIViewController {
     private func setupConstraints() {
         var quadViewConstraints = [NSLayoutConstraint]()
         // var cancelButtonConstraints = [NSLayoutConstraint]()
+        var flashButtonConstraints = [NSLayoutConstraint]()
         var shutterButtonConstraints = [NSLayoutConstraint]()
         var activityIndicatorConstraints = [NSLayoutConstraint]()
-        var flashButtonConstraints = [NSLayoutConstraint]()
 
         quadViewConstraints = [
             quadView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -177,23 +176,10 @@ public final class ScannerViewController: UIViewController {
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ]
 
-        if #available(iOS 11.0, *) {
-            // cancelButtonConstraints = [
-            //     cancelButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24.0),
-            //     view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
-            // ]
-
-            let shutterButtonBottomConstraint = view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
-            shutterButtonConstraints.append(shutterButtonBottomConstraint)
-        } else {
-            // cancelButtonConstraints = [
-            //     cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 24.0),
-            //     view.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
-            // ]
-
-            let shutterButtonBottomConstraint = view.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
-            shutterButtonConstraints.append(shutterButtonBottomConstraint)
-        }
+        // cancelButtonConstraints = [
+        //     cancelButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24.0),
+        //     view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
+        // ]
 
         flashButtonConstraints = [
             flashButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
@@ -202,7 +188,42 @@ public final class ScannerViewController: UIViewController {
             flashButton.heightAnchor.constraint(equalToConstant: 44)
         ]
 
-        NSLayoutConstraint.activate(quadViewConstraints + shutterButtonConstraints + activityIndicatorConstraints + flashButtonConstraints)
+        let shutterButtonBottomConstraint = view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
+        shutterButtonConstraints.append(shutterButtonBottomConstraint)
+
+        // if #available(iOS 11.0, *) {
+        //     // cancelButtonConstraints = [
+        //     //     cancelButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24.0),
+        //     //     view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
+        //     // ]
+        //
+        //     flashButtonConstraints = [
+        //         flashButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+        //         flashButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24),
+        //         flashButton.widthAnchor.constraint(equalToConstant: 44),
+        //         flashButton.heightAnchor.constraint(equalToConstant: 44)
+        //     ]
+
+        //     let shutterButtonBottomConstraint = view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
+        //     shutterButtonConstraints.append(shutterButtonBottomConstraint)
+        // } else {
+        //     // cancelButtonConstraints = [
+        //     //     cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 24.0),
+        //     //     view.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
+        //     // ]
+
+        //     flashButtonConstraints = [
+        //         flashButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+        //         flashButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24),
+        //         flashButton.widthAnchor.constraint(equalToConstant: 44),
+        //         flashButton.heightAnchor.constraint(equalToConstant: 44)
+        //     ]
+
+        //     let shutterButtonBottomConstraint = view.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
+        //     shutterButtonConstraints.append(shutterButtonBottomConstraint)
+        // }
+
+        NSLayoutConstraint.activate(quadViewConstraints + flashButtonConstraints + shutterButtonConstraints + activityIndicatorConstraints)
     }
 
     // MARK: - Tap to Focus
@@ -281,7 +302,7 @@ public final class ScannerViewController: UIViewController {
         case .unknown, .unavailable:
             flashEnabled = false
             flashButton.setImage(flashOffImage, for: .normal)
-            flashButton.tintColor = UIColor.lightGray
+            flashButton.tintColor = .lightGray
         }
     }
 

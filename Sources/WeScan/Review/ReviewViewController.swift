@@ -39,18 +39,37 @@ final class ReviewViewController: UIViewController {
 //        return button
 //    }()
 
-    private lazy var rotateButton: UIBarButtonItem = {
+    private lazy var rotateButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
         let image = UIImage(systemName: "rotate.right", named: "rotate", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
-        let button = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(rotateImage))
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(rotateImage), for: .touchUpInside)
         button.tintColor = .white
         return button
     }()
 
-    private lazy var doneButton: UIBarButtonItem = {
-        let button = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(finishScan))
-        button.tintColor = navigationController?.navigationBar.tintColor
+    private lazy var backButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let image = UIImage(systemName: "rotate.right", named: "rotate", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+        button.tintColor = .white
         return button
     }()
+
+    private lazy var doneButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let image = UIImage(systemName: "rotate.right", named: "rotate", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(finishScan), for: .touchUpInside)
+        button.tintColor = .white
+        return button
+    }()
+
+
 
     private let results: ImageScannerResults
 
@@ -71,69 +90,56 @@ final class ReviewViewController: UIViewController {
         enhancedImageIsAvailable = results.enhancedScan != nil
 
         setupViews()
-        setupToolbar()
         setupConstraints()
-
-        title = NSLocalizedString("wescan.review.title",
-                                  tableName: nil,
-                                  bundle: Bundle(for: ReviewViewController.self),
-                                  value: "Review",
-                                  comment: "The review title of the ReviewController"
-        )
-        navigationItem.rightBarButtonItem = doneButton
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        // We only show the toolbar (with the enhance button) if the enhanced image is available.
-        if enhancedImageIsAvailable {
-            navigationController?.setToolbarHidden(false, animated: true)
-        }
+        navigationController?.setNavigationBarHidden(true, animated: animated) 
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        navigationController?.setToolbarHidden(true, animated: true)
     }
 
     // MARK: Setups
 
     private func setupViews() {
         view.addSubview(imageView)
-    }
-
-    private func setupToolbar() {
-        guard enhancedImageIsAvailable else { return }
-
-        navigationController?.toolbar.barStyle = .blackTranslucent
-
-        let fixedSpace = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
-        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        toolbarItems = [flexibleSpace, rotateButton, fixedSpace]
+        view.addSubview(rotateButton)
+        view.addSubview(backButton)
+        view.addSubview(doneButton)
     }
 
     private func setupConstraints() {
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+        let imageViewConstraints = [
+            view.safeAreaLayoutGuide.topAnchor.constraint(equalTo: imageView.safeAreaLayoutGuide.topAnchor),
+            view.safeAreaLayoutGuide.trailingAnchor.constraint(equalTo: imageView.safeAreaLayoutGuide.trailingAnchor),
+            view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: imageView.safeAreaLayoutGuide.bottomAnchor),
+            view.safeAreaLayoutGuide.leadingAnchor.constraint(equalTo: imageView.safeAreaLayoutGuide.leadingAnchor)
+        ]
 
-        var imageViewConstraints: [NSLayoutConstraint] = []
-        if #available(iOS 11.0, *) {
-            imageViewConstraints = [
-                view.safeAreaLayoutGuide.topAnchor.constraint(equalTo: imageView.safeAreaLayoutGuide.topAnchor),
-                view.safeAreaLayoutGuide.trailingAnchor.constraint(equalTo: imageView.safeAreaLayoutGuide.trailingAnchor),
-                view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: imageView.safeAreaLayoutGuide.bottomAnchor),
-                view.safeAreaLayoutGuide.leadingAnchor.constraint(equalTo: imageView.safeAreaLayoutGuide.leadingAnchor)
-            ]
-        } else {
-            imageViewConstraints = [
-                view.topAnchor.constraint(equalTo: imageView.topAnchor),
-                view.trailingAnchor.constraint(equalTo: imageView.trailingAnchor),
-                view.bottomAnchor.constraint(equalTo: imageView.bottomAnchor),
-                view.leadingAnchor.constraint(equalTo: imageView.leadingAnchor)
-            ]
-        }
+        let rotateButtonConstraints = [
+            rotateButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            rotateButton.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
+        ]
 
-        NSLayoutConstraint.activate(imageViewConstraints)
+        let backButtonConstraints = [
+            backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+            backButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24),
+            backButton.widthAnchor.constraint(equalToConstant: 44),
+            backButton.heightAnchor.constraint(equalToConstant: 44)
+        ]
+
+        let nextButtonConstraints = [
+          doneButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+          doneButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -24),
+          doneButton.widthAnchor.constraint(equalToConstant: 44),
+          doneButton.heightAnchor.constraint(equalToConstant: 44)
+        ]
+
+        NSLayoutConstraint.activate(imageViewConstraints + rotateButtonConstraints + backButtonConstraints + nextButtonConstraints)
     }
 
     // MARK: - Actions
@@ -167,6 +173,10 @@ final class ReviewViewController: UIViewController {
         }
 
         reloadImage()
+    }
+
+    @objc func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
     }
 
     @objc private func finishScan() {

@@ -52,7 +52,7 @@ final class ReviewViewController: UIViewController {
     private lazy var backButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        let image = UIImage(systemName: "wand.and.rays.inverse", named: "enhance", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        let image = UIImage(systemName: "chevron.left.circle")
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         button.tintColor = .white
@@ -62,14 +62,12 @@ final class ReviewViewController: UIViewController {
     private lazy var doneButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        let image = UIImage(systemName: "wand.and.rays.inverse", named: "enhance", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        let image = UIImage(systemName: "checkmark.circle")
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(finishScan), for: .touchUpInside)
         button.tintColor = .white
         return button
     }()
-
-
 
     private let results: ImageScannerResults
 

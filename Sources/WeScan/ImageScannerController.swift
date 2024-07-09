@@ -41,6 +41,7 @@ public protocol ImageScannerControllerDelegate: NSObjectProtocol {
 /// 2. Edit the detected rectangle.
 /// 3. Review the cropped down version of the rectangle.
 public final class ImageScannerController: UINavigationController {
+    var isBorderDetectionDisabled: Bool
 
     /// The object that acts as the delegate of the `ImageScannerController`.
     public weak var imageScannerDelegate: ImageScannerControllerDelegate?
@@ -60,17 +61,11 @@ public final class ImageScannerController: UINavigationController {
         return .portrait
     }
 
-    public required init(image: UIImage? = nil, delegate: ImageScannerControllerDelegate? = nil) {
-        super.init(rootViewController: ScannerViewController())
+    public required init(image: UIImage? = nil, isBorderDetectionDisabled: Bool = false, delegate: ImageScannerControllerDelegate? = nil) {
+        self.isBorderDetectionDisabled = isBorderDetectionDisabled
+        super.init(rootViewController: ScannerViewController(isBorderDetectionDisabled: isBorderDetectionDisabled))
 
         self.imageScannerDelegate = delegate
-
-        if #available(iOS 13.0, *) {
-            navigationBar.tintColor = .label
-        } else {
-            navigationBar.tintColor = .black
-        }
-        navigationBar.isTranslucent = false
         self.view.addSubview(blackFlashView)
         setupConstraints()
 
@@ -85,6 +80,7 @@ public final class ImageScannerController: UINavigationController {
     }
 
     override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        self.isBorderDetectionDisabled = false
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
 
@@ -125,7 +121,7 @@ public final class ImageScannerController: UINavigationController {
     }
 
     public func resetScanner() {
-        setViewControllers([ScannerViewController()], animated: true)
+        setViewControllers([ScannerViewController(isBorderDetectionDisabled: self.isBorderDetectionDisabled)], animated: true)
     }
 
     private func setupConstraints() {

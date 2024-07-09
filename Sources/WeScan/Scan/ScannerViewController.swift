@@ -11,7 +11,8 @@ import AVFoundation
 import UIKit
 
 /// The `ScannerViewController` offers an interface to give feedback to the user regarding quadrilaterals that are detected. It also gives the user the opportunity to capture an image with a detected rectangle.
-public final class ScannerViewController: UIViewController {
+public final class ScannerViewController: UIViewController {    
+    var isBorderDetectionDisabled: Bool
 
     private var captureSessionManager: CaptureSessionManager?
     private let videoPreviewLayer = AVCaptureVideoPreviewLayer()
@@ -28,6 +29,15 @@ public final class ScannerViewController: UIViewController {
     /// The original bar style that was set by the host app
     private var originalBarStyle: UIBarStyle?
 
+    init(isBorderDetectionDisabled: Bool) {
+        self.isBorderDetectionDisabled = isBorderDetectionDisabled
+        super.init(nibName: nil, bundle: nil)
+    }
+  
+    required init?(coder: NSCoder) {
+      fatalError("init(coder:) has not been implemented")
+    }
+  
     private lazy var shutterButton: ShutterButton = {
         let button = ShutterButton()
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -133,8 +143,7 @@ public final class ScannerViewController: UIViewController {
         view.layer.addSublayer(videoPreviewLayer)
         quadView.translatesAutoresizingMaskIntoConstraints = false
         quadView.editable = false
-        view.addSubview(quadView)
-        // view.addSubview(cancelButton)
+        if (!isBorderDetectionDisabled) { view.addSubview(quadView) }
         view.addSubview(flashButton) // added by emburse
         view.addSubview(activityIndicator)
         view.addSubview(shutterButton)
@@ -158,12 +167,14 @@ public final class ScannerViewController: UIViewController {
         var shutterButtonConstraints = [NSLayoutConstraint]()
         var activityIndicatorConstraints = [NSLayoutConstraint]()
 
+        if (!isBorderDetectionDisabled) {
         quadViewConstraints = [
-            quadView.topAnchor.constraint(equalTo: view.topAnchor),
-            view.bottomAnchor.constraint(equalTo: quadView.bottomAnchor),
-            view.trailingAnchor.constraint(equalTo: quadView.trailingAnchor),
-            quadView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
-        ]
+                quadView.topAnchor.constraint(equalTo: view.topAnchor),
+                view.bottomAnchor.constraint(equalTo: quadView.bottomAnchor),
+                view.trailingAnchor.constraint(equalTo: quadView.trailingAnchor),
+                quadView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+            ]
+        }
 
         shutterButtonConstraints = [
             shutterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -332,10 +343,31 @@ extension ScannerViewController: RectangleDetectionDelegateProtocol {
     func captureSessionManager(_ captureSessionManager: CaptureSessionManager, didCapturePicture picture: UIImage, withQuad quad: Quadrilateral?) {
         activityIndicator.stopAnimating()
 
-        let editVC = EditScanViewController(image: picture, quad: quad)
-        navigationController?.pushViewController(editVC, animated: false)
+        if (isBorderDetectionDisabled) {
+            guard let imageScannerController = navigationController as? ImageScannerController else { return }
+            
+            let offset: CGFloat = 75
+            let topLeft = CGPoint(x: offset, y: offset)
+            let topRight = CGPoint(x: picture.size.width - offset, y: offset)
+            let bottomRight = CGPoint(x: picture.size.width - offset, y: picture.size.height - offset)
+            let bottomLeft = CGPoint(x: offset, y: picture.size.height - offset)
+            let defaultQuad = Quadrilateral(topLeft: topLeft, topRight: topRight, bottomRight: bottomRight, bottomLeft: bottomLeft)
 
-        shutterButton.isUserInteractionEnabled = true
+            let results = ImageScannerResults(
+                detectedRectangle: quad ?? defaultQuad,
+                originalScan: ImageScannerScan(image: picture),
+                croppedScan: ImageScannerScan(image: picture),
+                enhancedScan: ImageScannerScan(image: picture)
+            )
+
+            imageScannerController.imageScannerDelegate?
+            .imageScannerController(imageScannerController, didFinishScanningWithResults: results)
+        } else {
+            let editVC = EditScanViewController(image: picture, quad: quad)
+            navigationController?.pushViewController(editVC, animated: false)
+
+            shutterButton.isUserInteractionEnabled = true
+        }
     }
 
     func captureSessionManager(_ captureSessionManager: CaptureSessionManager, didDetectQuad quad: Quadrilateral?, _ imageSize: CGSize) {

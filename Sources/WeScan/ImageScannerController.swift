@@ -41,13 +41,14 @@ public protocol ImageScannerControllerDelegate: NSObjectProtocol {
 /// 2. Edit the detected rectangle.
 /// 3. Review the cropped down version of the rectangle.
 public final class ImageScannerController: UINavigationController {
+    public var isBorderDetectionEnabled: Bool
 
     /// The object that acts as the delegate of the `ImageScannerController`.
     public weak var imageScannerDelegate: ImageScannerControllerDelegate?
 
     // MARK: - Life Cycle
 
-    /// A black UIView, used to quickly display a black screen when the shutter button is presseed.
+    /// A black UIView, used to quickly display a black screen when the shutter button is pressed.
     internal let blackFlashView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(white: 0.0, alpha: 0.5)
@@ -60,8 +61,9 @@ public final class ImageScannerController: UINavigationController {
         return .portrait
     }
 
-    public required init(image: UIImage? = nil, delegate: ImageScannerControllerDelegate? = nil) {
-        super.init(rootViewController: ScannerViewController())
+    public required init(image: UIImage? = nil, isBorderDetectionEnabled: Bool = true, delegate: ImageScannerControllerDelegate? = nil) {
+        self.isBorderDetectionEnabled = isBorderDetectionEnabled
+        super.init(rootViewController: ScannerViewController(isBorderDetectionEnabled: isBorderDetectionEnabled))
 
         self.imageScannerDelegate = delegate
 
@@ -85,6 +87,7 @@ public final class ImageScannerController: UINavigationController {
     }
 
     override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        self.isBorderDetectionEnabled = true
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
 
@@ -125,7 +128,7 @@ public final class ImageScannerController: UINavigationController {
     }
 
     public func resetScanner() {
-        setViewControllers([ScannerViewController()], animated: true)
+        setViewControllers([ScannerViewController(isBorderDetectionEnabled: self.isBorderDetectionEnabled)], animated: true)
     }
 
     private func setupConstraints() {

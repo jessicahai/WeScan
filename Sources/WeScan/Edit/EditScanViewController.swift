@@ -30,27 +30,23 @@ final class EditScanViewController: UIViewController {
         return quadView
     }()
 
-    private lazy var nextButton: UIBarButtonItem = {
-        let title = NSLocalizedString("wescan.edit.button.next",
-                                      tableName: nil,
-                                      bundle: Bundle(for: EditScanViewController.self),
-                                      value: "Next",
-                                      comment: "A generic next button"
-        )
-        let button = UIBarButtonItem(title: title, style: .plain, target: self, action: #selector(pushReviewController))
+    private lazy var nextButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let image = UIImage(systemName: "checkmark.circle")
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(pushReviewController), for: .touchUpInside)
         button.tintColor = navigationController?.navigationBar.tintColor
         return button
     }()
 
-    private lazy var cancelButton: UIBarButtonItem = {
-        let title = NSLocalizedString("wescan.scanning.cancel",
-                                      tableName: nil,
-                                      bundle: Bundle(for: EditScanViewController.self),
-                                      value: "Cancel",
-                                      comment: "A generic cancel button"
-        )
-        let button = UIBarButtonItem(title: title, style: .plain, target: self, action: #selector(cancelButtonTapped))
-        button.tintColor = navigationController?.navigationBar.tintColor
+    private lazy var cancelButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let image = UIImage(systemName: "chevron.left.circle")
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
+        button.tintColor = .white
         return button
     }()
 
@@ -82,30 +78,35 @@ final class EditScanViewController: UIViewController {
 
         setupViews()
         setupConstraints()
-        title = NSLocalizedString("wescan.edit.title",
-                                  tableName: nil,
-                                  bundle: Bundle(for: EditScanViewController.self),
-                                  value: "Edit Scan",
-                                  comment: "The title of the EditScanViewController"
-        )
-        navigationItem.rightBarButtonItem = nextButton
-        if let firstVC = self.navigationController?.viewControllers.first, firstVC == self {
-            navigationItem.leftBarButtonItem = cancelButton
-        } else {
-            navigationItem.leftBarButtonItem = nil
-        }
+        // title = NSLocalizedString("wescan.edit.title",
+        //                           tableName: nil,
+        //                           bundle: Bundle(for: EditScanViewController.self),
+        //                           value: "Edit Scan",
+        //                           comment: "The title of the EditScanViewController"
+        // )
+        // navigationItem.rightBarButtonItem = nextButton
+        // if let firstVC = self.navigationController?.viewControllers.first, firstVC == self {
+        //     navigationItem.leftBarButtonItem = cancelButton
+        // } else {
+        //     navigationItem.leftBarButtonItem = nil
+        // }
 
         zoomGestureController = ZoomGestureController(image: image, quadView: quadView)
 
         let touchDown = UILongPressGestureRecognizer(target: zoomGestureController, action: #selector(zoomGestureController.handle(pan:)))
         touchDown.minimumPressDuration = 0
-        view.addGestureRecognizer(touchDown)
+        quadView.addGestureRecognizer(touchDown)
     }
 
     override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         adjustQuadViewConstraints()
         displayQuad()
+    }
+
+    override public func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated) 
     }
 
     override public func viewWillDisappear(_ animated: Bool) {
@@ -121,6 +122,8 @@ final class EditScanViewController: UIViewController {
     private func setupViews() {
         view.addSubview(imageView)
         view.addSubview(quadView)
+        view.addSubview(cancelButton)
+        view.addSubview(nextButton)
     }
 
     private func setupConstraints() {
@@ -141,7 +144,21 @@ final class EditScanViewController: UIViewController {
             quadViewHeightConstraint
         ]
 
-        NSLayoutConstraint.activate(quadViewConstraints + imageViewConstraints)
+        let cancelButtonConstraints = [
+            cancelButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+            cancelButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24),
+            cancelButton.widthAnchor.constraint(equalToConstant: 44),
+            cancelButton.heightAnchor.constraint(equalToConstant: 44)
+        ]
+
+        let nextButtonConstraints = [
+            nextButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+            nextButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -24),
+            nextButton.widthAnchor.constraint(equalToConstant: 44),
+            nextButton.heightAnchor.constraint(equalToConstant: 44)
+        ]
+
+        NSLayoutConstraint.activate(quadViewConstraints + imageViewConstraints + cancelButtonConstraints + nextButtonConstraints)
     }
 
     // MARK: - Actions
@@ -188,8 +205,10 @@ final class EditScanViewController: UIViewController {
             enhancedScan: enhancedScan
         )
 
-        let reviewViewController = ReviewViewController(results: results)
-        navigationController?.pushViewController(reviewViewController, animated: true)
+        if let imageScannerController = navigationController as? ImageScannerController {
+            imageScannerController.imageScannerDelegate?
+            .imageScannerController(imageScannerController, didFinishScanningWithResults: results)
+        }
     }
 
     private func displayQuad() {

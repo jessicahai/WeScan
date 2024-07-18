@@ -49,7 +49,7 @@ protocol RectangleDetectionDelegateProtocol: NSObjectProtocol {
 /// The CaptureSessionManager is responsible for setting up and managing the AVCaptureSession and the functions related to capturing.
 final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
 
-    private let isBorderDetectionEnabled: Bool
+    private let borderDetectionEnabled: Bool
     private let videoPreviewLayer: AVCaptureVideoPreviewLayer
     private let captureSession = AVCaptureSession()
     private let rectangleFunnel = RectangleFeaturesFunnel()
@@ -68,8 +68,8 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
 
     // MARK: Life Cycle
 
-    init?(isBorderDetectionEnabled: Bool = true, videoPreviewLayer: AVCaptureVideoPreviewLayer, delegate: RectangleDetectionDelegateProtocol? = nil) {
-        self.isBorderDetectionEnabled = isBorderDetectionEnabled
+    init?(borderDetectionEnabled: Bool = true, videoPreviewLayer: AVCaptureVideoPreviewLayer, delegate: RectangleDetectionDelegateProtocol? = nil) {
+        self.borderDetectionEnabled = borderDetectionEnabled
         self.videoPreviewLayer = videoPreviewLayer
 
         if delegate != nil {
@@ -130,7 +130,7 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
         }
 
         videoPreviewLayer.session = captureSession
-        videoPreviewLayer.videoGravity = self.isBorderDetectionEnabled ? .resizeAspectFill : .resizeAspect
+        videoPreviewLayer.videoGravity = self.borderDetectionEnabled ? .resizeAspectFill : .resizeAspect
 
         videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "video_ouput_queue"))
     }

@@ -12,7 +12,8 @@ import UIKit
 
 /// The `ScannerViewController` offers an interface to give feedback to the user regarding quadrilaterals that are detected. It also gives the user the opportunity to capture an image with a detected rectangle.
 public final class ScannerViewController: UIViewController {
-    var isBorderDetectionEnabled: Bool
+    /// Whether border detection is enabled
+    var borderDetectionEnabled: Bool
 
     private var captureSessionManager: CaptureSessionManager?
     private let videoPreviewLayer = AVCaptureVideoPreviewLayer()
@@ -29,8 +30,8 @@ public final class ScannerViewController: UIViewController {
     /// The original bar style that was set by the host app
     private var originalBarStyle: UIBarStyle?
 
-    init(isBorderDetectionEnabled: Bool) {
-        self.isBorderDetectionEnabled = isBorderDetectionEnabled
+    init(borderDetectionEnabled: Bool) {
+        self.borderDetectionEnabled = borderDetectionEnabled
         super.init(nibName: nil, bundle: nil)
     }
   
@@ -70,7 +71,7 @@ public final class ScannerViewController: UIViewController {
         ])
         
         // Add cancel icon
-        let cancelImage = UIImage(systemName: "xmark", named: "flash", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        let cancelImage = UIImage(systemName: "xmark", named: "cancel", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
         let cancelImageView = UIImageView(image: cancelImage)
         cancelImageView.contentMode = .center
         cancelImageView.tintColor = .black // Adjust the tint color as needed
@@ -172,7 +173,7 @@ public final class ScannerViewController: UIViewController {
         // setupNavigationBar()
         setupConstraints()
 
-        captureSessionManager = CaptureSessionManager(isBorderDetectionEnabled: isBorderDetectionEnabled, videoPreviewLayer: videoPreviewLayer, delegate: self)
+        captureSessionManager = CaptureSessionManager(borderDetectionEnabled: borderDetectionEnabled, videoPreviewLayer: videoPreviewLayer, delegate: self)
 
         originalBarStyle = navigationController?.navigationBar.barStyle
 
@@ -217,7 +218,7 @@ public final class ScannerViewController: UIViewController {
         view.layer.addSublayer(videoPreviewLayer)
         quadView.translatesAutoresizingMaskIntoConstraints = false
         quadView.editable = false
-        if (isBorderDetectionEnabled) { view.addSubview(quadView) }
+        if (borderDetectionEnabled) { view.addSubview(quadView) }
         view.addSubview(flashButton)
         view.addSubview(cancelButton)
         view.addSubview(shutterButton)
@@ -242,7 +243,7 @@ public final class ScannerViewController: UIViewController {
         var shutterButtonConstraints = [NSLayoutConstraint]()
         var activityIndicatorConstraints = [NSLayoutConstraint]()
 
-        if (isBorderDetectionEnabled) {
+        if (borderDetectionEnabled) {
             quadViewConstraints = [
                 quadView.topAnchor.constraint(equalTo: view.topAnchor),
                 view.bottomAnchor.constraint(equalTo: quadView.bottomAnchor),

@@ -41,7 +41,8 @@ public protocol ImageScannerControllerDelegate: NSObjectProtocol {
 /// 2. Edit the detected rectangle.
 /// 3. Review the cropped down version of the rectangle.
 public final class ImageScannerController: UINavigationController {
-    public var isBorderDetectionEnabled: Bool
+    /// Whether border detection is enabled
+    public var borderDetectionEnabled: Bool
 
     /// The object that acts as the delegate of the `ImageScannerController`.
     public weak var imageScannerDelegate: ImageScannerControllerDelegate?
@@ -61,9 +62,9 @@ public final class ImageScannerController: UINavigationController {
         return .portrait
     }
 
-    public required init(image: UIImage? = nil, isBorderDetectionEnabled: Bool = true, delegate: ImageScannerControllerDelegate? = nil) {
-        self.isBorderDetectionEnabled = isBorderDetectionEnabled
-        super.init(rootViewController: ScannerViewController(isBorderDetectionEnabled: isBorderDetectionEnabled))
+    public required init(image: UIImage? = nil, borderDetectionEnabled: Bool = true, delegate: ImageScannerControllerDelegate? = nil) {
+        self.borderDetectionEnabled = borderDetectionEnabled
+        super.init(rootViewController: ScannerViewController(borderDetectionEnabled: borderDetectionEnabled))
 
         self.imageScannerDelegate = delegate
 
@@ -87,7 +88,7 @@ public final class ImageScannerController: UINavigationController {
     }
 
     override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        self.isBorderDetectionEnabled = true
+        self.borderDetectionEnabled = true
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
 
@@ -128,7 +129,7 @@ public final class ImageScannerController: UINavigationController {
     }
 
     public func resetScanner() {
-        setViewControllers([ScannerViewController(isBorderDetectionEnabled: self.isBorderDetectionEnabled)], animated: true)
+        setViewControllers([ScannerViewController(borderDetectionEnabled: self.borderDetectionEnabled)], animated: false)
     }
 
     private func setupConstraints() {

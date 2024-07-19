@@ -15,6 +15,9 @@ public final class ScannerViewController: UIViewController {
     /// Whether border detection is enabled
     var borderDetectionEnabled: Bool
 
+    /// Whether flash is enabled
+    var flashEnabled: Bool
+
     private var captureSessionManager: CaptureSessionManager?
     private let videoPreviewLayer = AVCaptureVideoPreviewLayer()
 
@@ -24,14 +27,12 @@ public final class ScannerViewController: UIViewController {
     /// The view that draws the detected rectangles.
     private let quadView = QuadrilateralView()
 
-    /// Whether flash is enabled
-    private var flashEnabled = false
-
     /// The original bar style that was set by the host app
     private var originalBarStyle: UIBarStyle?
 
-    init(borderDetectionEnabled: Bool) {
+    init(borderDetectionEnabled: Bool, flashEnabled: Bool) {
         self.borderDetectionEnabled = borderDetectionEnabled
+        self.flashEnabled = flashEnabled
         super.init(nibName: nil, bundle: nil)
     }
   
@@ -126,10 +127,11 @@ public final class ScannerViewController: UIViewController {
         ])
         
         // Add flash icon
-        let flashImage = UIImage(systemName: "bolt.fill", named: "flash", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        let flashImage = UIImage(systemName: "bolt.slash.fill", named: "flashSlash", in: Bundle(for: ScannerViewController.self))
         let flashImageView = UIImageView(image: flashImage)
         flashImageView.contentMode = .center
-        flashImageView.tintColor = .black // Adjust the tint color as needed
+        flashImageView.tintColor = .black
+        flashImageView.tag = 01 // Required in order to change image when toggling flash 
         button.addSubview(flashImageView)
         
         // Layout flash icon
@@ -144,7 +146,11 @@ public final class ScannerViewController: UIViewController {
         
         // Check flash availability and set the alternate image if not available
         if !UIImagePickerController.isFlashAvailable(for: .rear) {
-            let flashOffImage = UIImage(systemName: "bolt.slash.fill", named: "flashUnavailable", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+            flashImageView.tintColor = .lightGray
+        }
+
+        if let device = AVCaptureDevice.default(for: AVMediaType.video), device.torchMode == .on {
+            let flashOffImage = UIImage(systemName: "bolt.fill", named: "flash", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
             flashImageView.image = flashOffImage?.withRenderingMode(.alwaysTemplate)
         }
         
@@ -173,7 +179,7 @@ public final class ScannerViewController: UIViewController {
         // setupNavigationBar()
         setupConstraints()
 
-        captureSessionManager = CaptureSessionManager(borderDetectionEnabled: borderDetectionEnabled, videoPreviewLayer: videoPreviewLayer, delegate: self)
+        captureSessionManager = CaptureSessionManager(borderDetectionEnabled: borderDetectionEnabled, flashEnabled: flashEnabled, videoPreviewLayer: videoPreviewLayer, delegate: self)
 
         originalBarStyle = navigationController?.navigationBar.barStyle
 
@@ -376,22 +382,24 @@ public final class ScannerViewController: UIViewController {
     @objc private func toggleFlash() {
         let state = CaptureSession.current.toggleFlash()
 
-        let flashImage = UIImage(systemName: "bolt.fill", named: "flash", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
-        let flashOffImage = UIImage(systemName: "bolt.slash.fill", named: "flashUnavailable", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        if let flashImageView = flashButton.viewWithTag(01) as? UIImageView {
+            let flashImage = UIImage(systemName: "bolt.fill", named: "flash", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+            let flashOffImage = UIImage(systemName: "bolt.slash.fill", named: "flashUnavailable", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
 
-        switch state {
-        case .on:
-            flashEnabled = true
-            flashButton.setImage(flashImage, for: .normal)
-            flashButton.tintColor = .yellow
-        case .off:
-            flashEnabled = false
-            flashButton.setImage(flashImage, for: .normal)
-            flashButton.tintColor = .red
-        case .unknown, .unavailable:
-            flashEnabled = false
-            flashButton.setImage(flashOffImage, for: .normal)
-            flashButton.tintColor = .lightGray
+            switch state {
+            case .on:
+                flashEnabled = true
+                flashImageView.image = flashImage
+                flashImageView.tintColor = .black
+            case .off:
+                flashEnabled = false
+                flashImageView.image = flashOffImage
+                flashImageView.tintColor = .black
+            case .unknown, .unavailable:
+                flashEnabled = false
+                flashImageView.image = flashOffImage
+                flashImageView.tintColor = .lightGray
+            }
         }
     }
 

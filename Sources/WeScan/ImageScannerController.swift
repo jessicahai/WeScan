@@ -44,6 +44,9 @@ public final class ImageScannerController: UINavigationController {
     /// Whether border detection is enabled
     public var borderDetectionEnabled: Bool
 
+    /// Whether flash is enabled
+    public var flashEnabled: Bool
+
     /// The object that acts as the delegate of the `ImageScannerController`.
     public weak var imageScannerDelegate: ImageScannerControllerDelegate?
 
@@ -62,9 +65,10 @@ public final class ImageScannerController: UINavigationController {
         return .portrait
     }
 
-    public required init(image: UIImage? = nil, borderDetectionEnabled: Bool = true, delegate: ImageScannerControllerDelegate? = nil) {
+    public required init(image: UIImage? = nil, borderDetectionEnabled: Bool = true, flashEnabled: Bool = false, delegate: ImageScannerControllerDelegate? = nil) {
         self.borderDetectionEnabled = borderDetectionEnabled
-        super.init(rootViewController: ScannerViewController(borderDetectionEnabled: borderDetectionEnabled))
+        self.flashEnabled = flashEnabled
+        super.init(rootViewController: ScannerViewController(borderDetectionEnabled: borderDetectionEnabled, flashEnabled: flashEnabled))
 
         self.imageScannerDelegate = delegate
 
@@ -89,6 +93,7 @@ public final class ImageScannerController: UINavigationController {
 
     override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         self.borderDetectionEnabled = true
+        self.flashEnabled = false
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
 
@@ -129,7 +134,10 @@ public final class ImageScannerController: UINavigationController {
     }
 
     public func resetScanner() {
-        setViewControllers([ScannerViewController(borderDetectionEnabled: self.borderDetectionEnabled)], animated: false)
+        guard let currentScannerVC = viewControllers.first as? ScannerViewController else { return }
+        let flashEnabled = currentScannerVC.flashEnabled
+
+        setViewControllers([ScannerViewController(borderDetectionEnabled: self.borderDetectionEnabled, flashEnabled: flashEnabled )], animated: false)
     }
 
     private func setupConstraints() {

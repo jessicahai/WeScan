@@ -50,6 +50,7 @@ protocol RectangleDetectionDelegateProtocol: NSObjectProtocol {
 final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
 
     private let borderDetectionEnabled: Bool
+    private let flashEnabled: Bool
     private let videoPreviewLayer: AVCaptureVideoPreviewLayer
     private let captureSession = AVCaptureSession()
     private let rectangleFunnel = RectangleFeaturesFunnel()
@@ -68,8 +69,9 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
 
     // MARK: Life Cycle
 
-    init?(borderDetectionEnabled: Bool = true, videoPreviewLayer: AVCaptureVideoPreviewLayer, delegate: RectangleDetectionDelegateProtocol? = nil) {
+    init?(borderDetectionEnabled: Bool = true, flashEnabled: Bool = false, videoPreviewLayer: AVCaptureVideoPreviewLayer, delegate: RectangleDetectionDelegateProtocol? = nil) {
         self.borderDetectionEnabled = borderDetectionEnabled
+        self.flashEnabled = flashEnabled
         self.videoPreviewLayer = videoPreviewLayer
 
         if delegate != nil {
@@ -148,6 +150,7 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
                 DispatchQueue.main.async {
                     guard let self = self else { return }
                     self.isDetecting = true
+                    if self.flashEnabled {self.enableFlash()}
                 }
             }
         case .notDetermined:
@@ -175,6 +178,20 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
         captureSession.stopRunning()
     }
 
+    internal func enableFlash() {
+        guard let device = AVCaptureDevice.default(for: AVMediaType.video), device.hasTorch else { return}
+        
+        do {
+            try device.lockForConfiguration()
+            device.torchMode = .on
+            device.unlockForConfiguration()
+        } catch {
+            let error = ImageScannerControllerError.inputDevice
+            delegate?.captureSessionManager(self, didFailWithError: error)
+            return 
+        }
+    }
+  
     internal func capturePhoto() {
         guard let connection = photoOutput.connection(with: .video), connection.isEnabled, connection.isActive else {
             let error = ImageScannerControllerError.capture

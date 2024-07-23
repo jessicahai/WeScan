@@ -18,7 +18,7 @@ final class ZoomGestureController {
     private var closestCorner: CornerPosition?
 
     init(image: UIImage, quadView: QuadrilateralView) {
-        self.image = image
+        self.image = image.applyingPortraitOrientation()
         self.quadView = quadView
     }
 

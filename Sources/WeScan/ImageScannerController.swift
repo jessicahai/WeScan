@@ -47,6 +47,9 @@ public final class ImageScannerController: UINavigationController {
     /// Whether flash is enabled
     public var flashEnabled: Bool
 
+    /// Whether flash is enabled
+    public var rectangle: Quadrilateral?
+
     /// The object that acts as the delegate of the `ImageScannerController`.
     public weak var imageScannerDelegate: ImageScannerControllerDelegate?
 
@@ -65,7 +68,7 @@ public final class ImageScannerController: UINavigationController {
         return .portrait
     }
 
-    public required init(image: UIImage? = nil, borderDetectionEnabled: Bool = true, flashEnabled: Bool = false, delegate: ImageScannerControllerDelegate? = nil) {
+    public required init(image: UIImage? = nil, borderDetectionEnabled: Bool = true, flashEnabled: Bool = false, rectangle: Quadrilateral? = nil, delegate: ImageScannerControllerDelegate? = nil) {
         self.borderDetectionEnabled = borderDetectionEnabled
         self.flashEnabled = flashEnabled
         super.init(rootViewController: ScannerViewController(borderDetectionEnabled: borderDetectionEnabled, flashEnabled: flashEnabled))
@@ -82,18 +85,24 @@ public final class ImageScannerController: UINavigationController {
         setupConstraints()
 
         // If an image was passed in by the host app (e.g. picked from the photo library), use it instead of the document scanner.
-        if let image {
-            detect(image: image) { [weak self] detectedQuad in
-                guard let self else { return }
-                let editViewController = EditScanViewController(image: image, quad: detectedQuad, rotateImage: false)
-                self.setViewControllers([editViewController], animated: false)
-            }
+      if let image {
+        if let rectangle {
+          let editViewController = EditScanViewController(image: image, quad: rectangle, rotateImage: false)
+          self.setViewControllers([editViewController], animated: false)
+        } else {
+          detect(image: image) { [weak self] detectedQuad in
+            guard let self else { return }
+            let editViewController = EditScanViewController(image: image, quad: detectedQuad, rotateImage: false)
+            self.setViewControllers([editViewController], animated: false)
+          }
         }
+      }
     }
 
     override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         self.borderDetectionEnabled = true
         self.flashEnabled = false
+        self.rectangle = nil
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
 

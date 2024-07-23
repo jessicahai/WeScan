@@ -30,23 +30,97 @@ final class EditScanViewController: UIViewController {
         return quadView
     }()
 
-    private lazy var nextButton: UIButton = {
+    private lazy var doneButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        let image = UIImage(systemName: "checkmark.circle")
-        button.setImage(image, for: .normal)
+
+        // Create circular background view
+        let circleSize: CGFloat = 40.0
+        let circleView = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
+        circleView.backgroundColor = .white
+        circleView.layer.cornerRadius = circleSize / 2.0
+        circleView.clipsToBounds = true
+        circleView.isUserInteractionEnabled = false // Disable interaction to let taps go through to button
+        
+        // Add circle view to button
+        button.addSubview(circleView)
+        button.sendSubviewToBack(circleView)
+        
+        // Layout circle view properly within the button
+        NSLayoutConstraint.activate([
+            circleView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            circleView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+            circleView.widthAnchor.constraint(equalToConstant: circleSize),
+            circleView.heightAnchor.constraint(equalToConstant: circleSize)
+        ])
+        
+        // Add done icon
+        let doneImage = UIImage(systemName: "checkmark", named: "done", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        let doneImageView = UIImageView(image: doneImage)
+        doneImageView.contentMode = .center
+        doneImageView.tintColor = .black // Adjust the tint color as needed
+        button.addSubview(doneImageView)
+        
+        // Layout done icon
+        doneImageView.translatesAutoresizingMaskIntoConstraints = false
+        let iconSize: CGFloat = 20.0
+        NSLayoutConstraint.activate([
+            doneImageView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            doneImageView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+            doneImageView.widthAnchor.constraint(equalToConstant: iconSize),
+            doneImageView.heightAnchor.constraint(equalToConstant: iconSize)
+        ])
+        
+        // Add action target
         button.addTarget(self, action: #selector(pushReviewController), for: .touchUpInside)
-        button.tintColor = navigationController?.navigationBar.tintColor
+        
         return button
     }()
 
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        let image = UIImage(systemName: "chevron.left.circle")
-        button.setImage(image, for: .normal)
+        
+        // Create circular background view
+        let circleSize: CGFloat = 40.0
+        let circleView = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
+        circleView.backgroundColor = .white
+        circleView.layer.cornerRadius = circleSize / 2.0
+        circleView.clipsToBounds = true
+        circleView.isUserInteractionEnabled = false // Disable interaction to let taps go through to button
+        
+        // Add circle view to button
+        button.addSubview(circleView)
+        button.sendSubviewToBack(circleView)
+        
+        // Layout circle view properly within the button
+        NSLayoutConstraint.activate([
+            circleView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            circleView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+            circleView.widthAnchor.constraint(equalToConstant: circleSize),
+            circleView.heightAnchor.constraint(equalToConstant: circleSize)
+        ])
+        
+        // Add cancel icon
+        let cancelImage = UIImage(systemName: "xmark", named: "cancel", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
+        let cancelImageView = UIImageView(image: cancelImage)
+        cancelImageView.contentMode = .center
+        cancelImageView.tintColor = .black // Adjust the tint color as needed
+        button.addSubview(cancelImageView)
+        
+        // Layout cancel icon
+        cancelImageView.translatesAutoresizingMaskIntoConstraints = false
+        let iconSize: CGFloat = 20.0
+        NSLayoutConstraint.activate([
+            cancelImageView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            cancelImageView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+            cancelImageView.widthAnchor.constraint(equalToConstant: iconSize),
+            cancelImageView.heightAnchor.constraint(equalToConstant: iconSize)
+        ])
+        
+        // Add action target
         button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
-        button.tintColor = .white
+        
         return button
     }()
 
@@ -84,7 +158,7 @@ final class EditScanViewController: UIViewController {
         //                           value: "Edit Scan",
         //                           comment: "The title of the EditScanViewController"
         // )
-        // navigationItem.rightBarButtonItem = nextButton
+        // navigationItem.rightBarButtonItem = doneButton
         // if let firstVC = self.navigationController?.viewControllers.first, firstVC == self {
         //     navigationItem.leftBarButtonItem = cancelButton
         // } else {
@@ -123,7 +197,7 @@ final class EditScanViewController: UIViewController {
         view.addSubview(imageView)
         view.addSubview(quadView)
         view.addSubview(cancelButton)
-        view.addSubview(nextButton)
+        view.addSubview(doneButton)
     }
 
     private func setupConstraints() {
@@ -146,19 +220,19 @@ final class EditScanViewController: UIViewController {
 
         let cancelButtonConstraints = [
             cancelButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
-            cancelButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24),
-            cancelButton.widthAnchor.constraint(equalToConstant: 44),
-            cancelButton.heightAnchor.constraint(equalToConstant: 44)
+            cancelButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 18),
+            cancelButton.widthAnchor.constraint(equalToConstant: 40),
+            cancelButton.heightAnchor.constraint(equalToConstant: 40)
         ]
 
-        let nextButtonConstraints = [
-            nextButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
-            nextButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -24),
-            nextButton.widthAnchor.constraint(equalToConstant: 44),
-            nextButton.heightAnchor.constraint(equalToConstant: 44)
+        let doneButtonConstraints = [
+            doneButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+            doneButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -18),
+            doneButton.widthAnchor.constraint(equalToConstant: 40),
+            doneButton.heightAnchor.constraint(equalToConstant: 40)
         ]
 
-        NSLayoutConstraint.activate(quadViewConstraints + imageViewConstraints + cancelButtonConstraints + nextButtonConstraints)
+        NSLayoutConstraint.activate(quadViewConstraints + imageViewConstraints + cancelButtonConstraints + doneButtonConstraints)
     }
 
     // MARK: - Actions

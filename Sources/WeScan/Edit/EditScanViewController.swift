@@ -32,33 +32,14 @@ final class EditScanViewController: UIViewController {
 
     private lazy var doneButton: UIButton = {
         let button = UIButton()
+        button.addCircularBackground()
         button.translatesAutoresizingMaskIntoConstraints = false
-
-        // Create circular background view
-        let circleSize: CGFloat = 40.0
-        let circleView = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
-        circleView.backgroundColor = .white
-        circleView.layer.cornerRadius = circleSize / 2.0
-        circleView.clipsToBounds = true
-        circleView.isUserInteractionEnabled = false // Disable interaction to let taps go through to button
-        
-        // Add circle view to button
-        button.addSubview(circleView)
-        button.sendSubviewToBack(circleView)
-        
-        // Layout circle view properly within the button
-        NSLayoutConstraint.activate([
-            circleView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
-            circleView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
-            circleView.widthAnchor.constraint(equalToConstant: circleSize),
-            circleView.heightAnchor.constraint(equalToConstant: circleSize)
-        ])
         
         // Add done icon
         let doneImage = UIImage(systemName: "checkmark", named: "done", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
         let doneImageView = UIImageView(image: doneImage)
         doneImageView.contentMode = .center
-        doneImageView.tintColor = .black // Adjust the tint color as needed
+        doneImageView.tintColor = .black
         button.addSubview(doneImageView)
         
         // Layout done icon

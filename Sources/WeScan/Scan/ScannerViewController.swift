@@ -49,33 +49,14 @@ public final class ScannerViewController: UIViewController {
 
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
+        button.addCircularBackground()
         button.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Create circular background view
-        let circleSize: CGFloat = 40.0
-        let circleView = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
-        circleView.backgroundColor = .white
-        circleView.layer.cornerRadius = circleSize / 2.0
-        circleView.clipsToBounds = true
-        circleView.isUserInteractionEnabled = false // Disable interaction to let taps go through to button
-        
-        // Add circle view to button
-        button.addSubview(circleView)
-        button.sendSubviewToBack(circleView)
-        
-        // Layout circle view properly within the button
-        NSLayoutConstraint.activate([
-            circleView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
-            circleView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
-            circleView.widthAnchor.constraint(equalToConstant: circleSize),
-            circleView.heightAnchor.constraint(equalToConstant: circleSize)
-        ])
         
         // Add cancel icon
         let cancelImage = UIImage(systemName: "xmark", named: "cancel", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
         let cancelImageView = UIImageView(image: cancelImage)
         cancelImageView.contentMode = .center
-        cancelImageView.tintColor = .black // Adjust the tint color as needed
+        cancelImageView.tintColor = .black
         button.addSubview(cancelImageView)
         
         // Layout cancel icon
@@ -104,27 +85,8 @@ public final class ScannerViewController: UIViewController {
 
     private lazy var flashButton: UIButton = {
         let button = UIButton()
+        button.addCircularBackground()
         button.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Create circular background view
-        let circleSize: CGFloat = 40.0
-        let circleView = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
-        circleView.backgroundColor = .white
-        circleView.layer.cornerRadius = circleSize / 2.0
-        circleView.clipsToBounds = true
-        circleView.isUserInteractionEnabled = false // Disable interaction to let taps go through to button
-        
-        // Add circle view to button
-        button.addSubview(circleView)
-        button.sendSubviewToBack(circleView)
-        
-        // Layout circle view properly within the button
-        NSLayoutConstraint.activate([
-            circleView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
-            circleView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
-            circleView.widthAnchor.constraint(equalToConstant: circleSize),
-            circleView.heightAnchor.constraint(equalToConstant: circleSize)
-        ])
         
         // Add flash icon
         let flashImage = UIImage(systemName: "bolt.slash.fill", named: "flashSlash", in: Bundle(for: ScannerViewController.self))

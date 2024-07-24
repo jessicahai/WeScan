@@ -138,7 +138,6 @@ public final class ScannerViewController: UIViewController {
         view.backgroundColor = UIColor.black
 
         setupViews()
-        // setupNavigationBar()
         setupConstraints()
 
         captureSessionManager = CaptureSessionManager(borderDetectionEnabled: borderDetectionEnabled, flashEnabled: flashEnabled, videoPreviewLayer: videoPreviewLayer, delegate: self)
@@ -193,17 +192,6 @@ public final class ScannerViewController: UIViewController {
         view.addSubview(activityIndicator)
     }
 
-    // private func setupNavigationBar() {
-    //     navigationItem.setLeftBarButton(flashButton, animated: false)
-    //     navigationItem.setRightBarButton(autoScanButton, animated: false)
-
-    //     if UIImagePickerController.isFlashAvailable(for: .rear) == false {
-    //         let flashOffImage = UIImage(systemName: "bolt.slash.fill", named: "flashUnavailable", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
-    //         flashButton.image = flashOffImage
-    //         flashButton.tintColor = UIColor.lightGray
-    //     }
-    // }
-
     private func setupConstraints() {
         var quadViewConstraints = [NSLayoutConstraint]()
         var flashButtonConstraints = [NSLayoutConstraint]()
@@ -248,38 +236,6 @@ public final class ScannerViewController: UIViewController {
         let shutterButtonBottomConstraint = view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
         shutterButtonConstraints.append(shutterButtonBottomConstraint)
 
-        // if #available(iOS 11.0, *) {
-        //     // cancelButtonConstraints = [
-        //     //     cancelButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24.0),
-        //     //     view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
-        //     // ]
-        //
-        //     flashButtonConstraints = [
-        //         flashButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-        //         flashButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24),
-        //         flashButton.widthAnchor.constraint(equalToConstant: 44),
-        //         flashButton.heightAnchor.constraint(equalToConstant: 44)
-        //     ]
-
-        //     let shutterButtonBottomConstraint = view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
-        //     shutterButtonConstraints.append(shutterButtonBottomConstraint)
-        // } else {
-        //     // cancelButtonConstraints = [
-        //     //     cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 24.0),
-        //     //     view.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
-        //     // ]
-
-        //     flashButtonConstraints = [
-        //         flashButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-        //         flashButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24),
-        //         flashButton.widthAnchor.constraint(equalToConstant: 44),
-        //         flashButton.heightAnchor.constraint(equalToConstant: 44)
-        //     ]
-
-        //     let shutterButtonBottomConstraint = view.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
-        //     shutterButtonConstraints.append(shutterButtonBottomConstraint)
-        // }
-
         NSLayoutConstraint.activate(quadViewConstraints + shutterButtonConstraints + flashButtonConstraints + cancelButtonConstraints  + activityIndicatorConstraints)
     }
 
@@ -301,27 +257,27 @@ public final class ScannerViewController: UIViewController {
         CaptureSession.current.removeFocusRectangleIfNeeded(focusRectangle, animated: true)
     }
 
-    // override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-    //     super.touchesBegan(touches, with: event)
+    override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
 
-    //     guard  let touch = touches.first else { return }
-    //     let touchPoint = touch.location(in: view)
-    //     let convertedTouchPoint: CGPoint = videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: touchPoint)
+        guard  let touch = touches.first else { return }
+        let touchPoint = touch.location(in: view)
+        let convertedTouchPoint: CGPoint = videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: touchPoint)
 
-    //     CaptureSession.current.removeFocusRectangleIfNeeded(focusRectangle, animated: false)
+        CaptureSession.current.removeFocusRectangleIfNeeded(focusRectangle, animated: false)
 
-    //     focusRectangle = FocusRectangleView(touchPoint: touchPoint)
-    //     view.addSubview(focusRectangle)
+        focusRectangle = FocusRectangleView(touchPoint: touchPoint)
+        view.addSubview(focusRectangle)
 
-    //     do {
-    //         try CaptureSession.current.setFocusPointToTapPoint(convertedTouchPoint)
-    //     } catch {
-    //         let error = ImageScannerControllerError.inputDevice
-    //         guard let captureSessionManager else { return }
-    //         captureSessionManager.delegate?.captureSessionManager(captureSessionManager, didFailWithError: error)
-    //         return
-    //     }
-    // }
+        do {
+            try CaptureSession.current.setFocusPointToTapPoint(convertedTouchPoint)
+        } catch {
+            let error = ImageScannerControllerError.inputDevice
+            guard let captureSessionManager else { return }
+            captureSessionManager.delegate?.captureSessionManager(captureSessionManager, didFailWithError: error)
+            return
+        }
+    }
 
     // MARK: - Actions
 
@@ -369,16 +325,6 @@ public final class ScannerViewController: UIViewController {
         guard let imageScannerController = navigationController as? ImageScannerController else { return }
         imageScannerController.imageScannerDelegate?.imageScannerControllerDidCancel(imageScannerController)
     }
-
-    /// Generates a `Quadrilateral` object that's cover all of image.
-    private static func defaultQuad(allOfImage image: UIImage) -> Quadrilateral {
-        let topLeft = CGPoint(x: 0, y: 0)
-        let topRight = CGPoint(x: image.size.width, y: 0)
-        let bottomRight = CGPoint(x: image.size.width, y: image.size.height)
-        let bottomLeft = CGPoint(x: 0, y: image.size.height)
-        let quad = Quadrilateral(topLeft: topLeft, topRight: topRight, bottomRight: bottomRight, bottomLeft: bottomLeft)
-        return quad
-    }
 }
 
 extension ScannerViewController: RectangleDetectionDelegateProtocol {
@@ -401,36 +347,39 @@ extension ScannerViewController: RectangleDetectionDelegateProtocol {
         activityIndicator.stopAnimating()
 
         guard let imageScannerController = navigationController as? ImageScannerController else { return }
-      
-        let detectedRectangle = quad ?? ScannerViewController.defaultQuad(allOfImage: picture)
 
-        guard let ciImage = CIImage(image: picture) else {
-            let error = ImageScannerControllerError.ciImageCreation
-            imageScannerController.imageScannerDelegate?.imageScannerController(imageScannerController, didFailWithError: error)
-            return
+        var croppedImage: UIImage?
+
+        if let quad {
+            guard let ciImage = CIImage(image: picture) else {
+                let error = ImageScannerControllerError.ciImageCreation
+                imageScannerController.imageScannerDelegate?.imageScannerController(imageScannerController, didFailWithError: error)
+                return
+            }
+
+            let cgOrientation = CGImagePropertyOrientation(picture.imageOrientation)
+            let orientedImage = ciImage.oriented(forExifOrientation: Int32(cgOrientation.rawValue))
+            let scaledQuad = quad.scale(picture.size, picture.size)
+
+            var cartesianScaledQuad = scaledQuad.toCartesian(withHeight: picture.size.height)
+            cartesianScaledQuad.reorganize()
+
+            let filteredImage = orientedImage.applyingFilter("CIPerspectiveCorrection", parameters: [
+                "inputTopLeft": CIVector(cgPoint: cartesianScaledQuad.bottomLeft),
+                "inputTopRight": CIVector(cgPoint: cartesianScaledQuad.bottomRight),
+                "inputBottomLeft": CIVector(cgPoint: cartesianScaledQuad.topLeft),
+                "inputBottomRight": CIVector(cgPoint: cartesianScaledQuad.topRight)
+            ])
+
+            if borderDetectionEnabled {
+                croppedImage = UIImage.from(ciImage: filteredImage)
+            }
         }
 
-        let cgOrientation = CGImagePropertyOrientation(picture.imageOrientation)
-        let orientedImage = ciImage.oriented(forExifOrientation: Int32(cgOrientation.rawValue))
-        let scaledQuad = detectedRectangle.scale(picture.size, picture.size)
-
-        // Cropped Image
-        var cartesianScaledQuad = scaledQuad.toCartesian(withHeight: picture.size.height)
-        cartesianScaledQuad.reorganize()
-
-        let filteredImage = orientedImage.applyingFilter("CIPerspectiveCorrection", parameters: [
-            "inputTopLeft": CIVector(cgPoint: cartesianScaledQuad.bottomLeft),
-            "inputTopRight": CIVector(cgPoint: cartesianScaledQuad.bottomRight),
-            "inputBottomLeft": CIVector(cgPoint: cartesianScaledQuad.topLeft),
-            "inputBottomRight": CIVector(cgPoint: cartesianScaledQuad.topRight)
-        ])
-
-        let croppedImage = UIImage.from(ciImage: filteredImage)
-
         let results = ImageScannerResults(
-          detectedRectangle: detectedRectangle,
+          detectedRectangle: quad,
           originalScan: ImageScannerScan(image: picture),
-          croppedScan: ImageScannerScan(image: croppedImage),
+          croppedScan: ImageScannerScan(image: croppedImage ?? picture),
           enhancedScan: ImageScannerScan(image: picture)
         )
 

@@ -213,10 +213,10 @@ public struct ImageScannerResults {
     public var doesUserPreferEnhancedScan: Bool
 
     /// The detected rectangle which was used to generate the `scannedImage`.
-    public var detectedRectangle: Quadrilateral
+    public var detectedRectangle: Quadrilateral?
 
     init(
-        detectedRectangle: Quadrilateral,
+        detectedRectangle: Quadrilateral?,
         originalScan: ImageScannerScan,
         croppedScan: ImageScannerScan,
         enhancedScan: ImageScannerScan?,

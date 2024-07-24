@@ -60,27 +60,8 @@ final class EditScanViewController: UIViewController {
 
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
+        button.addCircularBackground()
         button.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Create circular background view
-        let circleSize: CGFloat = 40.0
-        let circleView = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
-        circleView.backgroundColor = .white
-        circleView.layer.cornerRadius = circleSize / 2.0
-        circleView.clipsToBounds = true
-        circleView.isUserInteractionEnabled = false // Disable interaction to let taps go through to button
-        
-        // Add circle view to button
-        button.addSubview(circleView)
-        button.sendSubviewToBack(circleView)
-        
-        // Layout circle view properly within the button
-        NSLayoutConstraint.activate([
-            circleView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
-            circleView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
-            circleView.widthAnchor.constraint(equalToConstant: circleSize),
-            circleView.heightAnchor.constraint(equalToConstant: circleSize)
-        ])
         
         // Add cancel icon
         let cancelImage = UIImage(systemName: "xmark", named: "cancel", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
@@ -133,18 +114,6 @@ final class EditScanViewController: UIViewController {
 
         setupViews()
         setupConstraints()
-        // title = NSLocalizedString("wescan.edit.title",
-        //                           tableName: nil,
-        //                           bundle: Bundle(for: EditScanViewController.self),
-        //                           value: "Edit Scan",
-        //                           comment: "The title of the EditScanViewController"
-        // )
-        // navigationItem.rightBarButtonItem = doneButton
-        // if let firstVC = self.navigationController?.viewControllers.first, firstVC == self {
-        //     navigationItem.leftBarButtonItem = cancelButton
-        // } else {
-        //     navigationItem.leftBarButtonItem = nil
-        // }
 
         zoomGestureController = ZoomGestureController(image: image, quadView: quadView)
 

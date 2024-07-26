@@ -36,8 +36,11 @@ final class EditScanViewController: UIViewController {
         button.addCircularBackground()
         button.translatesAutoresizingMaskIntoConstraints = false
         
-        if let svgURL = Bundle(for: ScannerViewController.self).url(forResource: "done", withExtension: "svg"),
-        let svgImage = SVGKImage(contentsOf: svgURL) {
+        let resourcePath = Bundle.module.bundlePath
+        let svgFilePath = (resourcePath as NSString).appendingPathComponent("done.svg")
+        if FileManager.default.fileExists(atPath: svgFilePath) {
+          let svgURL = URL(fileURLWithPath: svgFilePath)
+          if let svgImage = SVGKImage(contentsOf: svgURL) {
             let uiImage = svgImage.uiImage
             let doneImageView = UIImageView(image: uiImage)
             doneImageView.contentMode = .center
@@ -53,6 +56,7 @@ final class EditScanViewController: UIViewController {
                 doneImageView.widthAnchor.constraint(equalToConstant: iconSize),
                 doneImageView.heightAnchor.constraint(equalToConstant: iconSize)
             ])
+          }
         }
 
         button.addTarget(self, action: #selector(pushReviewController), for: .touchUpInside)
@@ -65,8 +69,11 @@ final class EditScanViewController: UIViewController {
         button.addCircularBackground()
         button.translatesAutoresizingMaskIntoConstraints = false
 
-        if let svgURL = Bundle(for: ScannerViewController.self).url(forResource: "back", withExtension: "svg"),
-        let svgImage = SVGKImage(contentsOf: svgURL) {
+        let resourcePath = Bundle.module.bundlePath
+        let svgFilePath = (resourcePath as NSString).appendingPathComponent("back.svg")
+        if FileManager.default.fileExists(atPath: svgFilePath) {
+          let svgURL = URL(fileURLWithPath: svgFilePath)
+          if let svgImage = SVGKImage(contentsOf: svgURL) {
             let uiImage = svgImage.uiImage
             let cancelImageView = UIImageView(image: uiImage)
             cancelImageView.contentMode = .center
@@ -82,6 +89,7 @@ final class EditScanViewController: UIViewController {
                 cancelImageView.widthAnchor.constraint(equalToConstant: iconSize),
                 cancelImageView.heightAnchor.constraint(equalToConstant: iconSize)
             ])
+          }
         }
         
         button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)

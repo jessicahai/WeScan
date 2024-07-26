@@ -9,6 +9,7 @@
 
 import AVFoundation
 import UIKit
+import SVGKit
 
 /// The `ScannerViewController` offers an interface to give feedback to the user regarding quadrilaterals that are detected. It also gives the user the opportunity to capture an image with a detected rectangle.
 public final class ScannerViewController: UIViewController {
@@ -51,25 +52,30 @@ public final class ScannerViewController: UIViewController {
         let button = UIButton()
         button.addCircularBackground()
         button.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Add cancel icon
-        let cancelImage = UIImage(systemName: "xmark", named: "cancel", in: Bundle(for: ScannerViewController.self), compatibleWith: nil)
-        let cancelImageView = UIImageView(image: cancelImage)
-        cancelImageView.contentMode = .center
-        cancelImageView.tintColor = .black
-        button.addSubview(cancelImageView)
-        
-        // Layout cancel icon
-        cancelImageView.translatesAutoresizingMaskIntoConstraints = false
-        let iconSize: CGFloat = 20.0
-        NSLayoutConstraint.activate([
-            cancelImageView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
-            cancelImageView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
-            cancelImageView.widthAnchor.constraint(equalToConstant: iconSize),
-            cancelImageView.heightAnchor.constraint(equalToConstant: iconSize)
-        ])
-        
-        // Add action target
+
+        let resourcePath = Bundle.module.bundlePath
+        let svgFilePath = (resourcePath as NSString).appendingPathComponent("close.svg")
+        if FileManager.default.fileExists(atPath: svgFilePath) {
+          let svgURL = URL(fileURLWithPath: svgFilePath)
+          if let svgImage = SVGKImage(contentsOf: svgURL) {
+            let uiImage = svgImage.uiImage
+            let cancelImageView = UIImageView(image: uiImage)
+            cancelImageView.contentMode = .center
+            cancelImageView.tintColor = .black
+            button.addSubview(cancelImageView)
+            
+            // Layout cancel icon
+            cancelImageView.translatesAutoresizingMaskIntoConstraints = false
+            let iconSize: CGFloat = 20.0
+            NSLayoutConstraint.activate([
+              cancelImageView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+              cancelImageView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+              cancelImageView.widthAnchor.constraint(equalToConstant: iconSize),
+              cancelImageView.heightAnchor.constraint(equalToConstant: iconSize)
+            ])
+          }
+        }
+    
         button.addTarget(self, action: #selector(cancelImageScannerController), for: .touchUpInside)
         
         return button

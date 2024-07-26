@@ -12,20 +12,26 @@ let package = Package(
         .library(name: "WeScan", targets: ["WeScan"])
     ],
     dependencies: [
+        .package(url: "https://github.com/SVGKit/SVGKit.git", branch: "3.x"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.10.0")
     ],
     targets: [
-        .target(name: "WeScan",
-                resources: [
-                    .process("Resources")
-                ]),
+        .target(
+            name: "WeScan",
+            dependencies: [
+                "SVGKit"
+            ],
+            resources: [
+                .process("Resources")
+            ]
+        ),
         .testTarget(
             name: "WeScanTests",
             dependencies: [
                 "WeScan",
                 .product(name: "SnapshotTesting", package: "swift-snapshot-testing")
             ],
-            exclude:["Info.plist"],
+            exclude: ["Info.plist"],
             resources: [
                 .process("Resources"),
                 .copy("__Snapshots__")

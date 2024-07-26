@@ -43,8 +43,7 @@ final class EditScanViewController: UIViewController {
           if let svgImage = SVGKImage(contentsOf: svgURL) {
             let uiImage = svgImage.uiImage
             let doneImageView = UIImageView(image: uiImage)
-            doneImageView.contentMode = .center
-            doneImageView.tintColor = .black
+            doneImageView.contentMode = .scaleAspectFit
             button.addSubview(doneImageView)
             
             // Layout done icon
@@ -76,8 +75,7 @@ final class EditScanViewController: UIViewController {
           if let svgImage = SVGKImage(contentsOf: svgURL) {
             let uiImage = svgImage.uiImage
             let cancelImageView = UIImageView(image: uiImage)
-            cancelImageView.contentMode = .center
-            cancelImageView.tintColor = .black // Adjust the tint color as needed
+            cancelImageView.contentMode = .scaleAspectFit // Adjust the tint color as needed
             button.addSubview(cancelImageView)
             
             // Layout cancel icon

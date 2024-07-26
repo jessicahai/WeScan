@@ -60,8 +60,7 @@ public final class ScannerViewController: UIViewController {
           if let svgImage = SVGKImage(contentsOf: svgURL) {
             let uiImage = svgImage.uiImage
             let cancelImageView = UIImageView(image: uiImage)
-            cancelImageView.contentMode = .center
-            cancelImageView.tintColor = .black
+            cancelImageView.contentMode = .scaleAspectFit
             button.addSubview(cancelImageView)
             
             // Layout cancel icon
